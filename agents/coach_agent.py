@@ -62,7 +62,6 @@ def trainer_agent(llm: BaseLanguageModel, user_prompt: str, retriever: Optional[
     first_prompt = f"{system_prompt}\n\nЗапрос пользователя:\n{user_prompt}"
     first_response = llm.chat(first_prompt)
 
-    # print(f"\n Первый ответ\n {first_response}\n")
     sleep(1)
     
     # 3. Второй запрос с информацией из retriever
@@ -70,7 +69,6 @@ def trainer_agent(llm: BaseLanguageModel, user_prompt: str, retriever: Optional[
         relevant_docs = retriever.invoke(user_prompt)
         additional_info = "\n".join([doc.page_content for doc in relevant_docs])
 
-        # print(f"\n\n\nadditional_info: \n {additional_info} \n\n\n")
         second_prompt = f"""
             У меня есть план тренировок в тренажерном зале для спортсмена, а также дополнительная информация - в которой есть
             ссылки на you-tube видео - иллюстрирующие какие-то упражнения.
@@ -87,41 +85,3 @@ def trainer_agent(llm: BaseLanguageModel, user_prompt: str, retriever: Optional[
         final_response = first_response
     
     return final_response
-
-
-# def run_mistral_client(model="mistral-medium-latest"):
-#     api_key = "dNLiGfHEHQVIFTY1t0gAecNAljgBsnBf"
-#     return Mistral(api_key=api_key), model
-
-# class SimpleLLM:
-#     def __init__(self, client, model):
-#         self.client = client
-#         self.model = model
-
-#     def chat(self, prompt: str) -> str:
-#         response = self.client.chat.complete(
-#             model=self.model,
-#             messages=[
-#                 {"role": "user", "content": prompt}
-#             ]
-#         )
-#         return response.choices[0].message.content
-
-# if __name__ == "__main__":
-#     some_prompt = "Привет, я Егор, мне 20 лет, я вешу 74 килограмма, составь мне план тренировок для набора мышечной массы для игры в хоккей, а также план питания."
-
-#     CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-#     DB_PATH = os.path.join(CURRENT_DIR, "..", "db", "trainer_vectordb")
-
-#     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-
-#     vectordb = FAISS.load_local(DB_PATH, embeddings, allow_dangerous_deserialization=True)
-#     retriever = vectordb.as_retriever(k=15)
-
-#     mistral_client, mistral_model = run_mistral_client()
-
-#     llm = SimpleLLM(mistral_client, mistral_model)
-
-#     print("\n=== Ответ агента тренера ===\n")
-#     result = trainer_agent(llm, some_prompt, retriever=retriever)
-#     print(result)

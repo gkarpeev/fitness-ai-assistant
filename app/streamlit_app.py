@@ -1,5 +1,6 @@
 import os
 import sys
+from pathlib import Path
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(PROJECT_ROOT)
@@ -12,7 +13,6 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_community.retrievers import ArxivRetriever
 
-# Импортируем агентов
 from agents.coach_agent import trainer_agent
 from agents.nutritionist_agent import nutritionist_agent
 from agents.manager_agent import manager_agent
@@ -45,9 +45,17 @@ st.write("""
 def init_objects():
 
     # Инициализация LLM
-    api_key = "dNLiGfHEHQVIFTY1t0gAecNAljgBsnBf"
+    key_path = Path(__file__).parent / "keys" / "mistral_key.txt"
+    with open(key_path, "r", encoding="utf-8") as f:
+        api_key = f.read().strip()
+
+    if (api_key == ""):
+        st.write("Положите Mistral ключ в app/keys/mistral_key.txt")
+
     client = Mistral(api_key=api_key)
-    model = "mistral-medium-latest"
+    # model = "mistral-medium-latest"
+    # model = "mistral-medium"
+    model = "mistral-small-latest"
 
     class SimpleLLM:
         def __init__(self, client, model):
@@ -75,7 +83,7 @@ def init_objects():
 
     vectordb = FAISS.load_local(
         DB_PATH,
-        embeddings,
+        embeddings, 
         allow_dangerous_deserialization=True
     )
 
